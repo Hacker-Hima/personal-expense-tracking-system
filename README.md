@@ -1,4 +1,4 @@
-# Personal Expense Tracking System
+#💰 Personal Expense Tracking System
 
 A full-stack expense tracking and budget management application built using Spring Boot, Thymeleaf, MySQL, and Spring Security.
 
@@ -61,20 +61,20 @@ A full-stack expense tracking and budget management application built using Spri
 
 * Maven
 
-## Project Structure
+## 📁 Project Structure
 
 ```plaintext
-src/
- ├── main/
- │    ├── java/com/expensetracker/
- │    │      ├── config/
- │    │      ├── controller/
- │    │      ├── model/
- │    │      ├── repository/
- │    │      └── service/
- │    └── resources/
- │           ├── templates/
- │           └── application.properties
+src/main/java/com/expensetracker/
+├── config/         SecurityConfig, UserDetailsServiceImpl
+├── controller/     AuthController, ExpenseController, AdminController
+├── model/          User, Expense, ArchivedExpense
+├── repository/     UserRepository, ExpenseRepository, ArchivedExpenseRepository
+└── service/        ExpenseService, ExportService
+
+src/main/resources/
+├── templates/      login, register, user-dashboard, admin-dashboard,
+│                   admin-users, profile, history
+└── application.properties
 ```
 
 ## Setup Instructions
@@ -155,7 +155,7 @@ Password: *****
 
 ## Author
 
-Himachalam
+Himachalam C
 
 ## License
 
