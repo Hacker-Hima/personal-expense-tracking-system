@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin Dashboard – ExpenseTracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--primary:#667eea;--primary-dark:#764ba2;--bg:#f0f2f5;--card:#fff;--text:#2d3748;--muted:#718096;--border:#e2e8f0}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+nav{background:linear-gradient(135deg,#2d3748,#1a202c);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+.nav-brand{color:#fff;font-size:1.2rem;font-weight:700}
+.nav-badge{background:#fc8181;color:#fff;font-size:.7rem;padding:2px 8px;border-radius:999px;margin-left:8px;font-weight:600}
+.nav-actions{display:flex;align-items:center;gap:10px}
+.nav-link{color:rgba(255,255,255,.8);text-decoration:none;font-size:.875rem;font-weight:500;padding:7px 14px;border-radius:8px;transition:background .2s}
+.nav-link:hover,.nav-link.active{background:rgba(255,255,255,.15);color:#fff}
+.main{max-width:1400px;margin:0 auto;padding:28px 20px}
+.page-title{font-size:1.5rem;font-weight:700;margin-bottom:4px}
+.page-sub{color:var(--muted);font-size:.875rem;margin-bottom:28px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
+.stat-card{background:var(--card);border-radius:16px;padding:20px 22px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-top:3px solid}
+.stat-card.c1{border-color:#667eea}.stat-card.c2{border-color:#48bb78}.stat-card.c3{border-color:#f6ad55}.stat-card.c4{border-color:#fc8181}
+.stat-label{font-size:.78rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.stat-value{font-size:1.7rem;font-weight:700}
+.card{background:var(--card);border-radius:16px;padding:22px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:24px}
+.card-title{font-size:1rem;font-weight:600;margin-bottom:18px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+@media(max-width:860px){.two-col{grid-template-columns:1fr}}
+.chart-wrap{position:relative;height:240px}
+table{width:100%;border-collapse:collapse;font-size:.875rem}
+thead th{background:#f7fafc;padding:10px 14px;text-align:left;font-size:.78rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid var(--border)}
+tbody tr{border-bottom:1px solid #f0f2f5;transition:background .15s}
+tbody tr:hover{background:#f7fafc}
+tbody td{padding:11px 14px}
+.btn{padding:7px 14px;border:none;border-radius:8px;font-size:.8rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.btn-danger{background:#fff5f5;color:#c53030;border:1px solid #fed7d7}.btn-danger:hover{background:#fed7d7}
+.btn-warn{background:#fffaf0;color:#c05621;border:1px solid #fbd38d}.btn-warn:hover{background:#fbd38d}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:.75rem;font-weight:600}
+.badge-admin{background:#ebf8ff;color:#2b6cb0}.badge-user{background:#f0fff4;color:#276749}
+.badge-active{background:#f0fff4;color:#276749}.badge-inactive{background:#fff5f5;color:#c53030}
+.top-spender{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.top-spender:last-child{border-bottom:none}
+.rank{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700}
+.rank.gold{background:linear-gradient(135deg,#f6ad55,#ed8936)}
+.rank.silver{background:linear-gradient(135deg,#a0aec0,#718096)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-brand">💰 ExpenseTracker <span class="nav-badge">ADMIN</span></div>
+  <div class="nav-actions">
+    <a th:href="@{/admin/dashboard}" class="nav-link active">Dashboard</a>
+    <a th:href="@{/admin/users}" class="nav-link">Manage Users</a>
+    <form th:action="@{/logout}" method="post" style="margin:0">
+      <button type="submit" class="nav-link" style="background:rgba(255,255,255,.1);border:none;cursor:pointer;color:rgba(255,255,255,.8);font-family:inherit">Logout</button>
+    </form>
+  </div>
+</nav>
+<div class="main">
+  <div class="page-title">Admin Dashboard 🛡️</div>
+  <div class="page-sub">System overview and management</div>
+
+  <div class="stats-grid">
+    <div class="stat-card c1"><div class="stat-label">Total Users</div><div class="stat-value" th:text="${totalUsers}">0</div></div>
+    <div class="stat-card c2"><div class="stat-label">Total Transactions</div><div class="stat-value" th:text="${totalExpenseCount}">0</div></div>
+    <div class="stat-card c3"><div class="stat-label">Total Expenditure</div><div class="stat-value">₹<span th:text="${#numbers.formatDecimal(totalAll,1,'COMMA',0,'POINT')}">0</span></div></div>
+    <div class="stat-card c4"><div class="stat-label">Avg per User</div>
+      <div class="stat-value">₹<span th:text="${totalUsers > 0 ? #numbers.formatDecimal(totalAll / totalUsers, 1, 'COMMA', 0, 'POINT') : '0'}">0</span></div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">🏆 Top Spenders</div>
+      <div th:each="spender,i : ${topSpenders}" class="top-spender">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="rank" th:classappend="${i.index==0?'gold':(i.index==1?'silver':'')}" th:text="${i.count}">1</div>
+          <span th:text="${spender[0]}">username</span>
+        </div>
+        <strong>₹<span th:text="${#numbers.formatDecimal(spender[1],1,'COMMA',2,'POINT')}">0</span></strong>
+      </div>
+      <div th:if="${#lists.isEmpty(topSpenders)}" style="color:var(--muted);text-align:center;padding:24px">No data yet</div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 All Users</div>
+      <table>
+        <thead><tr><th>User</th><th>Role</th><th>Status</th><th>Budget</th></tr></thead>
+        <tbody>
+          <tr th:each="u : ${users}">
+            <td th:text="${u.username}">user</td>
+            <td><span class="badge" th:classappend="${u.role=='ROLE_ADMIN'?'badge-admin':'badge-user'}" th:text="${u.role=='ROLE_ADMIN'?'ADMIN':'USER'}">USER</span></td>
+            <td><span class="badge" th:classappend="${u.enabled?'badge-active':'badge-inactive'}" th:text="${u.enabled?'Active':'Disabled'}">Active</span></td>
+            <td>₹<span th:text="${#numbers.formatDecimal(u.monthlyBudget,1,'COMMA',0,'POINT')}">0</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 Recent Expenses (All Users)</div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>#</th><th>User</th><th>Date</th><th>Category</th><th>Description</th><th>Amount</th></tr></thead>
+        <tbody>
+          <tr th:each="exp,i : ${allExpenses}" th:if="${i.index < 50}">
+            <td th:text="${i.count}">1</td>
+            <td th:text="${exp.user.username}">user</td>
+            <td th:text="${exp.date}">date</td>
+            <td><span class="badge" style="background:#edf2f7;color:#4a5568" th:text="${exp.category}">cat</span></td>
+            <td th:text="${exp.description != null ? exp.description : '-'}">-</td>
+            <td style="font-weight:600;color:#276749">₹<span th:text="${#numbers.formatDecimal(exp.amount,1,'COMMA',2,'POINT')}">0</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>
