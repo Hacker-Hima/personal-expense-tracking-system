@@ -1,4 +1,4 @@
-###💰 Personal Expense Tracking System
+### 💰 Personal Expense Tracking System
 
 A full-stack expense tracking and budget management application built using Spring Boot, Thymeleaf, MySQL, and Spring Security.
 
